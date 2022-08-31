@@ -1,13 +1,41 @@
-token = YOUR_TOKEN_HERE
-prompt: YOUR_PROMPT_HERE
+#
+# Set your TOKEN for stable diffusion here
+#
+token: YOUR_TOKEN_HERE
+
+#
+# Set your iteration for each generation. It depends on your GPU (CUDA) memory.
+#
+steps: 150
+
+#
+# Set number of images for each generating procedure. It depends on your GPU (CUDA) memory.
+#
+pics: 1
+
+#
+# Set outut image size. It depends on your GPU (CUDA) memory.
+#
 width: 512
 height: 512
-# pic(s) for each generating processes, depending to your CUDA memory 
-pics: 1
-# if you want to draw generated pics if you have sixel-capable terminal
+
+#
+# Set 1 to draw picture with sixel, when you complete image generation. 
+#
 draw: 0
+
+#
+# Set your fixed SEED number for image generation. It output fixed images. 
+# If value < 0 then the images are generated randomly.
+#
+seed: -1
+
+#
+# Set your log file for generation
+#
 history: history.txt
-# if you want to give fix seed, set >= 0
-seed: 
-# steps (num of iterations)
-steps: 150
+
+#
+# Set your PROMPT here
+#
+prompt: YOUR_PROMPT_HERE
