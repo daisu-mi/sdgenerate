@@ -31,7 +31,7 @@ draw: 0
 seed: -1
 
 #
-# Set your log file for generation
+# Set your log file.
 #
 history: history.txt
 
