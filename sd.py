@@ -26,7 +26,7 @@ def readConfig(file, item):
   return(ret)
   pass
 
-def readToken(file):
+def readConfigToken(file):
   ret = readConfig(file, "token")
   if (ret == ''):
     print("Setup your token in " + file)
@@ -34,7 +34,7 @@ def readToken(file):
   return(ret)
   pass
 
-def readPrompt(file):
+def readConfigPrompt(file):
   ret = readConfig(file, "prompt")
   if (ret == ''):
     print("Setup your prompt in " + file)
@@ -42,7 +42,7 @@ def readPrompt(file):
   return(ret)
   pass
 
-def readHeight(file):
+def readConfigHeight(file):
   ret = readConfig(file, "height")
   if (ret == ''):
     ret = 512
@@ -51,7 +51,7 @@ def readHeight(file):
   return(ret)
   pass
 
-def readWidth(file):
+def readConfigWidth(file):
   ret = readConfig(file, "width")
   if (ret == ''):
     ret = 512
@@ -60,7 +60,7 @@ def readWidth(file):
   return(ret)
   pass
 
-def readPics(file):
+def readConfigPics(file):
   ret = readConfig(file, "pics")
   if (ret == ''):
     ret = 1
@@ -69,7 +69,7 @@ def readPics(file):
   return(ret)
   pass
 
-def readDraw(file):
+def readConfigDraw(file):
   ret = readConfig(file, "draw")
   if (ret == ''):
     ret = 0
@@ -78,7 +78,27 @@ def readDraw(file):
   return(ret)
   pass
 
-def readHistory(file):
+def readConfigSeed(file):
+  ret = readConfig(file, "seed")
+  if (ret == ''):
+    ret = -1
+  else:
+    ret = int(ret)
+  return(ret)
+  pass
+
+def readConfigSteps(file):
+  ret = readConfig(file, "steps")
+  if (ret == ''):
+    ret = 150
+  else:
+    ret = int(ret)
+  return(ret)
+  pass
+
+
+
+def readConfigHistory(file):
   ret = readConfig(file, "history")
   if (ret == ''):
       ret = 'history.txt'
@@ -100,7 +120,7 @@ def drawFile(file):
 
 
 if __name__ == '__main__':
-  token = readToken(CONFIG_FILE)
+  token = readConfigToken(CONFIG_FILE)
 
   pipe = StableDiffusionPipeline.from_pretrained(MODEL_ID, revision="fp16", torch_dtype=torch.float16, use_auth_token=token)
   pipe.to(DEVICE)
@@ -115,18 +135,21 @@ if __name__ == '__main__':
     nums = 100
     for i in range(nums):
       print("loop:" + str(i))
-      # read (re-read) config
-      prompt = readPrompt(CONFIG_FILE)
-      pics = readPics(CONFIG_FILE)
-      draw = readDraw(CONFIG_FILE)
-      width = readWidth(CONFIG_FILE)
-      height = readHeight(CONFIG_FILE)
-      history = readHistory(CONFIG_FILE)
+      # readConfig (re-readConfig) config
+      prompt = readConfigPrompt(CONFIG_FILE)
+      pics = readConfigPics(CONFIG_FILE)
+      draw = readConfigDraw(CONFIG_FILE)
+      width = readConfigWidth(CONFIG_FILE)
+      height = readConfigHeight(CONFIG_FILE)
+      steps = readConfigSteps(CONFIG_FILE)
+      seed = readConfigSeed(CONFIG_FILE)
+      history = readConfigHistory(CONFIG_FILE)
 
       prompts = [prompt] * pics
 
       # storing random seed for reproducibility
-      seed = random.randrange(0, 2147483647, 1)
+      if (seed < 0):
+        seed = random.randrange(0, 2147483647, 1)
 
       generator = torch.Generator(DEVICE).manual_seed(seed)
 
