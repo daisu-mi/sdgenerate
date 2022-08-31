@@ -1,0 +1,9 @@
+token = YOUR_TOKEN_HERE
+prompt: YOUR_PROMPT_HERE
+width: 512
+height: 512
+# pic(s) for each generating processes : think about your CUDA memory 
+pics: 1
+# if you want to draw generated pics (you need sixel-capable terminal)
+draw: 0
+history: history.txt
