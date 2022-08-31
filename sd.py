@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys,os,re,datetime,random,torch
 from diffusers import StableDiffusionPipeline
 from torch import autocast
@@ -132,9 +133,9 @@ if __name__ == '__main__':
   draw = 0
 
   with autocast(DEVICE):
-    nums = 100
-    for i in range(nums):
-      print("loop:" + str(i))
+    loops = 10000
+    for i in range(loops):
+      print("Loop:" + str(i))
       # readConfig (re-readConfig) config
       prompt = readConfigPrompt(CONFIG_FILE)
       pics = readConfigPics(CONFIG_FILE)
@@ -164,7 +165,6 @@ if __name__ == '__main__':
         writeHistory(history, filename + ',' + prompt)
         if (draw == 1):
             drawFile(filename)
-            print(filename)
-
+            print("Width:" + str(width) + " , Height:" + str(height) + " , Steps:" + str(steps) + " , Seed:" + str(seed) + ", Filename:" + filename + ", Prompt: " + prompt)
         j = j + 1
       i = i + 1
