@@ -2,8 +2,12 @@ token = YOUR_TOKEN_HERE
 prompt: YOUR_PROMPT_HERE
 width: 512
 height: 512
-# pic(s) for each generating processes : think about your CUDA memory 
+# pic(s) for each generating processes, depending to your CUDA memory 
 pics: 1
-# if you want to draw generated pics (you need sixel-capable terminal)
+# if you want to draw generated pics if you have sixel-capable terminal
 draw: 0
 history: history.txt
+# if you want to give fix seed, set >= 0
+seed: 
+# steps (num of iterations)
+steps: 150
