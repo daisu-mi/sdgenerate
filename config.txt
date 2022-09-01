@@ -1,17 +1,29 @@
 #
-# Set your TOKEN for stable diffusion here
+# Set your TOKEN
 #
 token: YOUR_TOKEN_HERE
 
 #
-# Set your iteration for each generation. It depends on your GPU (CUDA) memory.
+# Set your PROMPT
 #
-steps: 150
+prompt: YOUR_PROMPT_HERE
 
 #
-# Set number of images for each generating procedure. It depends on your GPU (CUDA) memory.
+# Set your iteration for each generation. It depends on your GPU (CUDA) memory.
+# (num_inference_steps)
 #
-pics: 1
+iterations: 150
+
+#
+# Set concurrent levels for each generation. It depends on your GPU (CUDA) memory.
+# [(prompt)] * concurs
+#
+concurs: 1
+
+#
+# Set your guidance level for each generation.
+#
+guidance: 7.5
 
 #
 # Set outut image size. It depends on your GPU (CUDA) memory.
@@ -33,9 +45,6 @@ seed: -1
 #
 # Set your log file.
 #
-history: history.txt
+log: sd.log
 
-#
-# Set your PROMPT here
-#
-prompt: YOUR_PROMPT_HERE
+
