@@ -14,6 +14,12 @@ def getPrefix():
   return(datetime.datetime.now(JST).strftime('%Y%m%d_%H%M%S'))
   pass
 
+def getDate():
+  t_delta = datetime.timedelta(hours=9)
+  JST = datetime.timezone(t_delta, 'JST')
+  return(datetime.datetime.now(JST).strftime('%Y-%m-%d %H:%M:%S'))
+  pass
+
 def readConfig(file, item):
   ret = ''
   with open(file) as f:
@@ -31,6 +37,37 @@ def readConfigToken(file):
   ret = readConfig(file, "token")
   if (ret == ''):
     print("Setup your token in " + file)
+    exit()
+  return(ret)
+  pass
+
+def readConfigLoops(file):
+  ret = readConfig(file, "loops")
+  if (ret == ''):
+    ret = 1
+  else:
+    ret = int(ret)
+  return(ret)
+  pass
+
+def readConfigWidth(file):
+  ret = readConfig(file, "width")
+  if (ret == ''):
+    ret = 512
+  else:
+    ret = int(ret)
+  return(ret)
+  pass
+
+def readConfigConcurs(file):
+  ret = readConfig(file, "pics")
+  if (ret == ''):
+    ret = 1
+  else:
+    ret = int(ret)
+  return(ret)
+  pass
+  if (ret == ''):
     exit()
   return(ret)
   pass
@@ -61,8 +98,8 @@ def readConfigWidth(file):
   return(ret)
   pass
 
-def readConfigPics(file):
-  ret = readConfig(file, "pics")
+def readConfigConcurs(file):
+  ret = readConfig(file, "concurs")
   if (ret == ''):
     ret = 1
   else:
@@ -88,27 +125,36 @@ def readConfigSeed(file):
   return(ret)
   pass
 
-def readConfigSteps(file):
-  ret = readConfig(file, "steps")
+def readConfigIterations(file):
+  ret = readConfig(file, "iterations")
   if (ret == ''):
-    ret = 150
+    ret = 50
   else:
     ret = int(ret)
   return(ret)
   pass
 
-
-
-def readConfigHistory(file):
-  ret = readConfig(file, "history")
+def readConfigGuidance(file):
+  ret = readConfig(file, "guidance")
   if (ret == ''):
-      ret = 'history.txt'
+    ret = 7.5
+  else:
+    ret = float(ret)
   return(ret)
   pass
 
-def writeHistory(file, buf):
+
+def readConfigLog(file):
+  ret = readConfig(file, "log")
+  if (ret == ''):
+      ret = 'log.txt'
+  return(ret)
+  pass
+
+def writeLog(file, input):
+  output = getDate() + ',' + str(input)
   with open(file, 'a') as f:
-    print(buf, file=f)
+    print(output, file=f)
   pass
 
 def drawFile(file):
@@ -119,42 +165,37 @@ def drawFile(file):
         encoder.encode(file)
   pass
 
-
-if __name__ == '__main__':
+def doStableDiffusion():
   token = readConfigToken(CONFIG_FILE)
 
   pipe = StableDiffusionPipeline.from_pretrained(MODEL_ID, revision="fp16", torch_dtype=torch.float16, use_auth_token=token)
   pipe.to(DEVICE)
 
-  pics = 1
-  width = 512
-  height = 512
-  steps = 150
-  draw = 0
-
   with autocast(DEVICE):
-    loops = 10000
+    loops = readConfigLoops(CONFIG_FILE)
     for i in range(loops):
       print("Loop:" + str(i))
-      # readConfig (re-readConfig) config
-      prompt = readConfigPrompt(CONFIG_FILE)
-      pics = readConfigPics(CONFIG_FILE)
-      draw = readConfigDraw(CONFIG_FILE)
-      width = readConfigWidth(CONFIG_FILE)
-      height = readConfigHeight(CONFIG_FILE)
-      steps = readConfigSteps(CONFIG_FILE)
-      seed = readConfigSeed(CONFIG_FILE)
-      history = readConfigHistory(CONFIG_FILE)
 
-      prompts = [prompt] * pics
+      # read parameters from config file,
+      prompt     = readConfigPrompt(CONFIG_FILE)
+      width      = readConfigWidth(CONFIG_FILE)
+      height     = readConfigHeight(CONFIG_FILE)
+      iterations = readConfigIterations(CONFIG_FILE)
+      concurs    = readConfigConcurs(CONFIG_FILE)
+      draw       = readConfigDraw(CONFIG_FILE)
+      seed       = readConfigSeed(CONFIG_FILE)
+      log        = readConfigLog(CONFIG_FILE)
+      guidance   = readConfigGuidance(CONFIG_FILE)
+
+      # applying concursrent tasks
+      prompts = [prompt] * concurs
 
       # storing random seed for reproducibility
       if (seed < 0):
         seed = random.randrange(0, 2147483647, 1)
-
       generator = torch.Generator(DEVICE).manual_seed(seed)
 
-      images = pipe(prompts, num_inference_steps=steps, width=width, height=height, generator=generator)["sample"]
+      images = pipe(prompts, num_inference_steps=iterations, guidance=guidance, width=width, height=height, generator=generator)["sample"]
 
       prefix = getPrefix()
 
@@ -162,9 +203,19 @@ if __name__ == '__main__':
       for image in images:
         filename = prefix + '_' + str(i) + '_' + str(seed) + '_' + str(j) + '.png'
         image.save(filename)
-        writeHistory(history, filename + ',' + prompt)
+
+        buf = "Width:" + str(width) + ",Height:" + str(height) + ",Iterations:" + str(iterations) + ",Guidance:" + str(guidance) + ",Seed:" + str(seed) + ",Filename:" + filename + ",Prompt:\'" + prompt + "\'"
+
+        writeLog(log, buf)
+
         if (draw == 1):
             drawFile(filename)
-            print("Width:" + str(width) + " , Height:" + str(height) + " , Steps:" + str(steps) + " , Seed:" + str(seed) + ", Filename:" + filename + ", Prompt: " + prompt)
+
+        print(buf)
+
         j = j + 1
       i = i + 1
+  pass
+
+if __name__ == '__main__':
+  doStableDiffusion()
