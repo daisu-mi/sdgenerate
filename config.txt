@@ -1,50 +1,29 @@
 #
-# Set your TOKEN
+# Preload Section
 #
+device: cuda
+model: CompVis/stable-diffusion-v1-4
 token: YOUR_TOKEN_HERE
+loops: 1
 
 #
-# Set your PROMPT
+# Ondemand Section
 #
-prompt: YOUR_PROMPT_HERE
-
+#  Prompt (added incrementaly)
 #
-# Set your iteration for each generation. It depends on your GPU (CUDA) memory.
-# (num_inference_steps)
+prompt: red apple, 
+prompt: moon
 #
-iterations: 150
-
-#
-# Set concurrent levels for each generation. It depends on your GPU (CUDA) memory.
-# [(prompt)] * concurs
+#  Other parameters
 #
 concurs: 1
-
-#
-# Set your guidance level for each generation.
-#
-guidance: 7.5
-
-#
-# Set outut image size. It depends on your GPU (CUDA) memory.
-#
+iterations: 50
 width: 512
 height: 512
-
-#
-# Set 1 to draw picture with sixel, when you complete image generation. 
-#
-draw: 0
-
-#
-# Set your fixed SEED number for image generation. It output fixed images. 
-# If value < 0 then the images are generated randomly.
-#
 seed: -1
-
+strength: 0.7
+guidance: 8
 #
-# Set your log file.
+#  Uncomment if you want to draw generated images with libsixel
 #
-log: sd.log
-
-
+#draw: 1
