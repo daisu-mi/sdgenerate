@@ -24,6 +24,10 @@ seed: -1
 strength: 0.7
 guidance: 8
 #
+#  Basefile for img2img
+#
+#basefile: base.png
+#
 #  Uncomment if you want to draw generated images with libsixel
 #
 #draw: 1
